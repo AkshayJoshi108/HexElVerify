@@ -1,0 +1,526 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=2.0)
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-0.25, 0.25), 
+    point2=(0.25, -0.25))
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=2.0)
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-0.2, 0.2), 
+    point2=(0.2, -0.2))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Part', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part'].BaseSolidExtrude(depth=0.2, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].parts['Part'].features['Solid extrude-1'].setValues(
+    depth=0.6)
+mdb.models['Model-1'].parts['Part'].regenerate()
+mdb.models['Model-1'].parts['Part'].regenerate()
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=
+    mdb.models['Model-1'].parts['Part'].features['Solid extrude-1'].sketch)
+mdb.models['Model-1'].parts['Part'].projectReferencesOntoSketch(filter=
+    COPLANAR_EDGES, sketch=mdb.models['Model-1'].sketches['__edit__'], 
+    upToFeature=
+    mdb.models['Model-1'].parts['Part'].features['Solid extrude-1'])
+del mdb.models['Model-1'].sketches['__edit__']
+mdb.models['Model-1'].parts['Part'].features['Solid extrude-1'].setValues(
+    depth=0.4)
+mdb.models['Model-1'].parts['Part'].regenerate()
+mdb.models['Model-1'].parts['Part'].regenerate()
+mdb.models['Model-1'].Material(name='Material-1')
+mdb.models['Model-1'].materials['Material-1'].Density(table=((1.5e-06, ), ))
+mdb.models['Model-1'].materials['Material-1'].Hyperelastic(materialType=
+    ISOTROPIC, table=((100.0, 0.0008), ), testData=OFF, type=NEO_HOOKE, 
+    volumetricResponse=VOLUMETRIC_DATA)
+mdb.models['Model-1'].HomogeneousSolidSection(material='Material-1', name=
+    'Section-1', thickness=None)
+mdb.models['Model-1'].parts['Part'].Set(cells=
+    mdb.models['Model-1'].parts['Part'].cells.getSequenceFromMask(('[#1 ]', ), 
+    ), name='Set-1')
+mdb.models['Model-1'].parts['Part'].SectionAssignment(offset=0.0, offsetField=
+    '', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['Part'].sets['Set-1'], sectionName='Section-1', 
+    thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].parts['Part'].seedEdgeBySize(constraint=FINER, 
+    deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['Part'].edges.getSequenceFromMask(('[#fff ]', 
+    ), ), size=0.4)
+mdb.models['Model-1'].parts['Part'].generateMesh()
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-1', part=
+    mdb.models['Model-1'].parts['Part'])
+mdb.models['Model-1'].rootAssembly.translate(instanceList=('Part-1', ), vector=
+    (0.2, 0.2, -0.4))
+mdb.models['Model-1'].StaticStep(name='Step-1', nlgeom=ON, previous='Initial')
+mdb.models['Model-1'].EncastreBC(createStepName='Initial', localCsys=None, 
+    name='BC-1', region=Region(
+    faces=mdb.models['Model-1'].rootAssembly.instances['Part-1'].faces.getSequenceFromMask(
+    mask=('[#2 ]', ), )))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Step-1', 
+    distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=None, name=
+    'BC-2', region=Region(
+    vertices=mdb.models['Model-1'].rootAssembly.instances['Part-1'].vertices.getSequenceFromMask(
+    mask=('[#c9 ]', ), )), u1=0.1, u2=0.3, u3=UNSET, ur1=UNSET, ur2=UNSET, ur3=
+    UNSET)
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-1', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, queue=None, resultsFormat=ODB, scratch='', type=
+    ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.JobFromInputFile(atTime=None, explicitPrecision=SINGLE, 
+    getMemoryFromAnalysis=True, inputFileName=
+    'C:\\Users\\aj686\\OneDrive - University of Cambridge\\Documents\\HexElverify\\Job-1.inp'
+    , memory=90, memoryUnits=PERCENTAGE, multiprocessingMode=DEFAULT, name=
+    'Job-1-1', nodalOutputPrecision=SINGLE, numCpus=1, numGPUs=0, queue=None, 
+    resultsFormat=ODB, scratch='', type=ANALYSIS, userSubroutine='', waitHours=
+    0, waitMinutes=0)
+mdb.jobs['Job-1-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-1-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 0, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(WARNING, {'phase': BATCHPRE_PHASE, 
+    'message': 'OUTPUT REQUEST DG IS ONLY AVAILABLE FOR *HYPERELASTIC/FOAM AND *USER MATERIAL.', 
+    'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\aj686\\OneDrive - University of Cambridge\\Documents\\HexElverify\\Job-1-1.odb', 
+    'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 28332, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-1-1', 'memory': 29.0})
+mdb.jobs['Job-1-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 32196.0, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 22.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-1-1', 'severe': 0, 'iterations': 4, 
+    'phase': STANDARD_PHASE, 'equilibrium': 4})
+mdb.jobs['Job-1-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-1-1'})
+mdb.jobs['Job-1-1']._Message(JOB_COMPLETED, {
+    'time': 'Fri Dec  2 17:58:43 2022', 'jobName': 'Job-1-1'})
+# Save by aj686 on 2022_12_02-18.27.30; build 2020 2019_09_13-18.49.31 163176
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.Model(modelType=STANDARD_EXPLICIT, name='Model-2')
+mdb.models['Model-2'].ConstrainedSketch(name='__profile__', sheetSize=10.0)
+del mdb.models['Model-2'].sketches['__profile__']
+mdb.models['Model-1'].parts['Part'].deleteMesh(regions=
+    mdb.models['Model-1'].parts['Part'].cells.getSequenceFromMask(('[#1 ]', ), 
+    ))
+mdb.models['Model-1'].parts['Part'].seedEdgeBySize(constraint=FINER, 
+    deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['Part'].edges.getSequenceFromMask(('[#fff ]', 
+    ), ), size=0.05)
+mdb.models['Model-1'].parts['Part'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-3', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, queue=None, resultsFormat=ODB, scratch='', type=
+    ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.JobFromInputFile(atTime=None, explicitPrecision=SINGLE, 
+    getMemoryFromAnalysis=True, inputFileName=
+    'C:\\Users\\aj686\\OneDrive - University of Cambridge\\Documents\\HexElverify\\Job-3.inp'
+    , memory=90, memoryUnits=PERCENTAGE, multiprocessingMode=DEFAULT, name=
+    'Job-3-1', nodalOutputPrecision=SINGLE, numCpus=1, numGPUs=0, queue=None, 
+    resultsFormat=ODB, scratch='', type=ANALYSIS, userSubroutine='', waitHours=
+    0, waitMinutes=0)
+mdb.jobs['Job-3-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-3-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 0, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': BATCHPRE_PHASE, 
+    'message': 'OUTPUT REQUEST DG IS ONLY AVAILABLE FOR *HYPERELASTIC/FOAM AND *USER MATERIAL.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\aj686\\OneDrive - University Of Cambridge\\Documents\\HexElverify\\Job-3-1.odb', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 4240, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-3-1', 'memory': 35.0})
+mdb.jobs['Job-3-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 32196.0, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 23.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 32 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 54 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'EXCESSIVE DISTORTION AT A TOTAL OF 12 INTEGRATION POINTS IN SOLID (CONTINUUM) ELEMENTS', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.0, 'attempts': ' 1U', 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.25, 'attempts': 2, 
+    'timeIncrement': 0.25, 'increment': 1, 'stepTime': 0.25, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 6, 
+    'phase': STANDARD_PHASE, 'equilibrium': 6})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 8 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 2, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.5, 'attempts': 1, 
+    'timeIncrement': 0.25, 'increment': 2, 'stepTime': 0.5, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 5, 
+    'phase': STANDARD_PHASE, 'equilibrium': 5})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 10 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 3, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.75, 'attempts': 1, 
+    'timeIncrement': 0.25, 'increment': 3, 'stepTime': 0.75, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 6, 
+    'phase': STANDARD_PHASE, 'equilibrium': 6})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 2 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 20 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'EXCESSIVE DISTORTION AT A TOTAL OF 4 INTEGRATION POINTS IN SOLID (CONTINUUM) ELEMENTS', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.75, 'attempts': ' 1U', 
+    'timeIncrement': 0.25, 'increment': 4, 'stepTime': 0.75, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 4, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.8125, 'attempts': 2, 
+    'timeIncrement': 0.0625, 'increment': 4, 'stepTime': 0.8125, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 4, 
+    'phase': STANDARD_PHASE, 'equilibrium': 4})
+mdb.jobs['Job-3-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 6 negative eigenvalues.', 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 5, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.875, 'attempts': 1, 
+    'timeIncrement': 0.0625, 'increment': 5, 'stepTime': 0.875, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 9, 
+    'phase': STANDARD_PHASE, 'equilibrium': 9})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 6, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 0.9375, 'attempts': 1, 
+    'timeIncrement': 0.0625, 'increment': 6, 'stepTime': 0.9375, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-3-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 7, 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 0.0625, 'increment': 7, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-3-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-3-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-3-1'})
+mdb.jobs['Job-3-1']._Message(JOB_COMPLETED, {
+    'time': 'Mon Dec  5 13:10:27 2022', 'jobName': 'Job-3-1'})
+del mdb.models['Model-2']
+mdb.Model(name='Model-2', objectToCopy=mdb.models['Model-1'])
+mdb.models['Model-2'].rootAssembly.Set(faces=
+    mdb.models['Model-2'].rootAssembly.instances['Part-1'].faces.getSequenceFromMask(
+    ('[#8 ]', ), ), name='Set-3')
+mdb.models['Model-2'].boundaryConditions['BC-2'].setValues(region=
+    mdb.models['Model-2'].rootAssembly.sets['Set-3'])
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-2', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='Job-5', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numGPUs=0, queue=None, resultsFormat=ODB, scratch='', type=
+    ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.JobFromInputFile(atTime=None, explicitPrecision=SINGLE, 
+    getMemoryFromAnalysis=True, inputFileName=
+    'C:\\Users\\aj686\\OneDrive - University of Cambridge\\Documents\\HexElverify\\Job-5.inp'
+    , memory=90, memoryUnits=PERCENTAGE, multiprocessingMode=DEFAULT, name=
+    'Job-5-1', nodalOutputPrecision=SINGLE, numCpus=1, numGPUs=0, queue=None, 
+    resultsFormat=ODB, scratch='', type=ANALYSIS, userSubroutine='', waitHours=
+    0, waitMinutes=0)
+mdb.jobs['Job-5-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': BATCHPRE_PHASE, 
+    'message': 'OUTPUT REQUEST DG IS ONLY AVAILABLE FOR *HYPERELASTIC/FOAM AND *USER MATERIAL.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\aj686\\OneDrive - University Of Cambridge\\Documents\\HexElverify\\Job-5-1.odb', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 1712, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-5-1', 'memory': 35.0})
+mdb.jobs['Job-5-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 32196.0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 23.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 143 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 273 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'EXCESSIVE DISTORTION AT A TOTAL OF 292 INTEGRATION POINTS IN SOLID (CONTINUUM) ELEMENTS', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.0, 'attempts': ' 1U', 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.25, 'attempts': 2, 
+    'timeIncrement': 0.25, 'increment': 1, 'stepTime': 0.25, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 1 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 2, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.5, 'attempts': 1, 
+    'timeIncrement': 0.25, 'increment': 2, 'stepTime': 0.5, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 9 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 3, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.875, 'attempts': 1, 
+    'timeIncrement': 0.375, 'increment': 3, 'stepTime': 0.875, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 4, 
+    'phase': STANDARD_PHASE, 'equilibrium': 4})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 4, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 0.125, 'increment': 4, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(JOB_COMPLETED, {
+    'time': 'Mon Dec  5 13:18:25 2022', 'jobName': 'Job-5-1'})
+mdb.models['Model-2'].boundaryConditions['BC-2'].setValues(u1=UNSET, ur2=0.7)
+mdb.jobs['Job-5-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': BATCHPRE_PHASE, 
+    'message': 'OUTPUT REQUEST DG IS ONLY AVAILABLE FOR *HYPERELASTIC/FOAM AND *USER MATERIAL.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\aj686\\OneDrive - University Of Cambridge\\Documents\\HexElverify\\Job-5-1.odb', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 16172, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-5-1', 'memory': 35.0})
+mdb.jobs['Job-5-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 32196.0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 23.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 173 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 155 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 102 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'EXCESSIVE DISTORTION AT A TOTAL OF 52 INTEGRATION POINTS IN SOLID (CONTINUUM) ELEMENTS', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.0, 'attempts': ' 1U', 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 4, 
+    'phase': STANDARD_PHASE, 'equilibrium': 4})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 1 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.25, 'attempts': 2, 
+    'timeIncrement': 0.25, 'increment': 1, 'stepTime': 0.25, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 4 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 2, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.5, 'attempts': 1, 
+    'timeIncrement': 0.25, 'increment': 2, 'stepTime': 0.5, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 9 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 3, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.875, 'attempts': 1, 
+    'timeIncrement': 0.375, 'increment': 3, 'stepTime': 0.875, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 1 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 4, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 0.125, 'increment': 4, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(JOB_COMPLETED, {
+    'time': 'Mon Dec  5 13:24:34 2022', 'jobName': 'Job-5-1'})
+mdb.models['Model-2'].boundaryConditions['BC-2'].setValues(u1=0.2, u3=0.2, ur2=
+    UNSET)
+# Save by aj686 on 2022_12_05-13.34.40; build 2020 2019_09_13-18.49.31 163176
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.jobs['Job-5-1'].submit(consistencyChecking=OFF)
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': BATCHPRE_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': BATCHPRE_PHASE, 
+    'message': 'OUTPUT REQUEST DG IS ONLY AVAILABLE FOR *HYPERELASTIC/FOAM AND *USER MATERIAL.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FILE, {'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\aj686\\OneDrive - University Of Cambridge\\Documents\\HexElverify\\Job-5-1.odb', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': BATCHPRE_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STARTED, {'phase': STANDARD_PHASE, 
+    'clientHost': 'C-22-30', 'handle': 14868, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MEMORY_ESTIMATE, {'phase': STANDARD_PHASE, 
+    'jobName': 'Job-5-1', 'memory': 35.0})
+mdb.jobs['Job-5-1']._Message(PHYSICAL_MEMORY, {'phase': STANDARD_PHASE, 
+    'physical_memory': 32196.0, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(MINIMUM_MEMORY, {'minimum_memory': 23.0, 
+    'phase': STANDARD_PHASE, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 102 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'EXCESSIVE DISTORTION AT A TOTAL OF 148 INTEGRATION POINTS IN SOLID (CONTINUUM) ELEMENTS', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.0, 'attempts': ' 1U', 
+    'timeIncrement': 1.0, 'increment': 1, 'stepTime': 0.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 1, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.25, 'attempts': 2, 
+    'timeIncrement': 0.25, 'increment': 1, 'stepTime': 0.25, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 2, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.5, 'attempts': 1, 
+    'timeIncrement': 0.25, 'increment': 2, 'stepTime': 0.5, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 3, 
+    'phase': STANDARD_PHASE, 'equilibrium': 3})
+mdb.jobs['Job-5-1']._Message(WARNING, {'phase': STANDARD_PHASE, 
+    'message': 'The system matrix has 9 negative eigenvalues.', 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 3, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 0.875, 'attempts': 1, 
+    'timeIncrement': 0.375, 'increment': 3, 'stepTime': 0.875, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 4, 
+    'phase': STANDARD_PHASE, 'equilibrium': 4})
+mdb.jobs['Job-5-1']._Message(ODB_FRAME, {'phase': STANDARD_PHASE, 'step': 0, 
+    'frame': 4, 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(STATUS, {'totalTime': 1.0, 'attempts': 1, 
+    'timeIncrement': 0.125, 'increment': 4, 'stepTime': 1.0, 'step': 1, 
+    'jobName': 'Job-5-1', 'severe': 0, 'iterations': 2, 
+    'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['Job-5-1']._Message(END_STEP, {'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(COMPLETED, {'phase': STANDARD_PHASE, 
+    'message': 'Analysis phase complete', 'jobName': 'Job-5-1'})
+mdb.jobs['Job-5-1']._Message(JOB_COMPLETED, {
+    'time': 'Mon Dec  5 13:36:36 2022', 'jobName': 'Job-5-1'})
+# Save by aj686 on 2022_12_05-13.57.07; build 2020 2019_09_13-18.49.31 163176
